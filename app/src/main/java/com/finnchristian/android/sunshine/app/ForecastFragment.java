@@ -22,13 +22,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by finnchr on 14.02.2015.
  */
 public class ForecastFragment extends Fragment {
-    public static final String WEATHRE_URI = "http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7";
+    public static final String WEATHER_URI = "http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7";
 
     public ForecastFragment() {
     }
@@ -48,6 +47,9 @@ public class ForecastFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
+                FetchWeatherTask task = new FetchWeatherTask(WEATHER_URI);
+                task.execute();
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
