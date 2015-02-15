@@ -141,8 +141,6 @@ public class ForecastFragment extends Fragment {
                     .appendQueryParameter("cnt", Integer.toString(NUM_DAYS))
                     .build();
 
-            Log.d(TAG, "Built uri: " + uri.toString());
-
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
