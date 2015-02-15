@@ -112,10 +112,17 @@ public class ForecastFragment extends Fragment {
         protected void onPostExecute(String[] result) {
             if(result != null) {
                 Log.d(TAG, "Update forecast adapeter with fresh data");
+
+                // Don't notify changes while updating the adapter
+                forecastAdapter.setNotifyOnChange(false);
+
                 forecastAdapter.clear();
                 for (String item : result) {
                     forecastAdapter.add(item);
                 }
+
+                // Let's notify observers that the data has changed
+                forecastAdapter.notifyDataSetChanged();
             }
             else {
                 Log.e(TAG, "Something went wrong while trying to update the forecast!");
