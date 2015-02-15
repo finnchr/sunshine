@@ -154,8 +154,6 @@ public class ForecastFragment extends Fragment {
             try {
                 // Construct the URL for the OpenWeatherMap query
                 // Possible parameters are available at OWM's forecast API page, at
-                // http://openweathermap.org/API#forecast
-                //URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7");
                 URL url = new URL(uri.toString());
 
                 // Create the request to OpenWeatherMap, and open the connection
