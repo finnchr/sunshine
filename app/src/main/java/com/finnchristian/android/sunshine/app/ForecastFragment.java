@@ -141,7 +141,6 @@ public class ForecastFragment extends Fragment {
                     .scheme("http")
                     .authority("api.openweathermap.org")
                     .path("data/2.5/forecast/daily")
-                            //.appendQueryParameter("q", "94043")
                     .appendQueryParameter("q", postCode)
                     .appendQueryParameter("mode", MODE)
                     .appendQueryParameter("units", UNITS)
