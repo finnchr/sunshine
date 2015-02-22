@@ -1,8 +1,12 @@
 package com.finnchristian.android.sunshine.app;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.format.Time;
@@ -13,8 +17,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import com.example.android.sunshine.app.DetailActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,11 +36,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by finnchr on 14.02.2015.
@@ -57,11 +61,16 @@ public class ForecastFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                FetchWeatherTask task = new FetchWeatherTask();
-                task.execute("94043");
+                updateWeather();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -74,12 +83,7 @@ public class ForecastFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        List<String> weekForecast = new ArrayList<>();/* Arrays.asList("Today - Sunny - 88 / 63",
-                "Tomorrow - Foggy - 70 / 46",
-                "Weds - Cloudy - 72 / 63",
-                "Thurs - Rainy - 64 / 51",
-                "Fri - Foggy - 70 / 46",
-                "Sat - Sunny - 76 / 68");*/
+        List<String> weekForecast = new ArrayList<>();
 
         FragmentActivity activity = getActivity();
 
@@ -93,10 +97,41 @@ public class ForecastFragment extends Fragment {
                 // Forecast data
                 weekForecast);
 
-        ListView forecaseListView = (ListView)rootView.findViewById(R.id.listview_forecast);
+        final ListView forecaseListView = (ListView)rootView.findViewById(R.id.listview_forecast);
         forecaseListView.setAdapter(forecastAdapter);
 
+        forecaseListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //String forecast = (String) forecaseListView.getItemAtPosition(position);
+                String forecast = forecastAdapter.getItem(position);
+
+                //Toast toast = Toast.makeText(getActivity(), forecast, Toast.LENGTH_LONG);
+                //toast.show();
+
+                Bundle parameters = new Bundle();
+                parameters.putString("forecast", forecast);
+
+                Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
+                detailIntent.putExtras(parameters);
+                detailIntent.putExtra(Intent.EXTRA_TEXT, forecast);
+
+                startActivity(detailIntent);
+            }
+        });
+
         return rootView;
+    }
+
+    private void updateWeather() {
+        String locationKey = getString(R.string.pref_location_key);
+        String defaultLocation = getString(R.string.pref_location_default);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = pref.getString(locationKey, defaultLocation);
+
+        FetchWeatherTask task = new FetchWeatherTask();
+        //task.execute("94043");
+        task.execute(location);
     }
 
     private class FetchWeatherTask extends AsyncTask<String, String, String[]> {
