@@ -22,7 +22,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.android.sunshine.app.DetailActivity;
+import com.finnchristian.android.sunshine.app.DetailActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
