@@ -1,6 +1,9 @@
 package com.finnchristian.android.sunshine.app;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
@@ -52,16 +55,41 @@ public class MainActivity extends ActionBarActivity {
             return true;
         }
 
+        else if(id == R.id.action_show_preferred_location) {
+            openPreferredLocationInMap();
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
+
+
+    private void openPreferredLocationInMap() {
+        String locationKey = getString(R.string.pref_location_key);
+        String defaultLocation = getString(R.string.pref_location_default);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        String location = pref.getString(locationKey, defaultLocation);
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        Uri uri = Uri.parse("geo:0,0").buildUpon().appendQueryParameter("q", location).build();
+        //Uri uri = Uri.parse(String.format("geo:0,0?q=%s", location));
+        intent.setData(uri);
+
+        // Make sure we're able to start activity before actually starting it
+        if(intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
+
+
 
     /**
      * A placeholder fragment containing a simple view.
      */
     /*
-    public static class PlaceholderFragment extends Fragment {
+    public static class DetailFragment extends Fragment {
 
-        public PlaceholderFragment() {
+        public DetailFragment() {
         }
 
         @Override

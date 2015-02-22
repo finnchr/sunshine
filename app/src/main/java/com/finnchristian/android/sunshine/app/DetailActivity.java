@@ -1,18 +1,18 @@
 package com.finnchristian.android.sunshine.app;
 
 import android.content.Intent;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import com.finnchristian.android.sunshine.app.R;
-import com.finnchristian.android.sunshine.app.SettingsActivity;
 
 
 public class DetailActivity extends ActionBarActivity {
@@ -23,7 +23,7 @@ public class DetailActivity extends ActionBarActivity {
         setContentView(R.layout.activity_detail);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
+                    .add(R.id.container, new DetailFragment())
                     .commit();
         }
     }
@@ -56,9 +56,61 @@ public class DetailActivity extends ActionBarActivity {
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class PlaceholderFragment extends Fragment {
+    public static class DetailFragment extends Fragment {
+        private static final String TAG = DetailFragment.class.getSimpleName();
+        private static final String FORECAST_SHARE_HASHTAG = "#SunshineApp";
 
-        public PlaceholderFragment() {
+        protected String forecastStr;
+        protected ShareActionProvider shareActionProvider;
+
+        public DetailFragment() {
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setHasOptionsMenu(true);
+        }
+
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            inflater.inflate(R.menu.detailfragment, menu);
+
+            MenuItem menuItem = menu.findItem(R.id.action_share_weather);
+            //shareActionProvider = (ShareActionProvider) menuItem.getActionProvider();
+            shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+
+            if(shareActionProvider != null) {
+                shareActionProvider.setShareIntent(createShareForecastIntent());
+            }
+            else {
+                Log.d(TAG, "Share action provider is null ...");
+            }
+
+            super.onCreateOptionsMenu(menu, inflater);
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            if(item.getItemId() == R.id.action_share_weather) {
+            }
+
+            return super.onOptionsItemSelected(item);
+        }
+
+        /** Defines a default (dummy) share intent to initialize the action provider.
+         * However, as soon as the actual content to be used in the intent
+         * is known or changes, you must update the share intent by again calling
+         * mShareActionProvider.setShareIntent()
+         */
+        private Intent createShareForecastIntent() {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+            intent.setType("text/plain");
+            //String forecast = getActivity().getIntent().getStringExtra(Intent.EXTRA_TEXT);
+            intent.putExtra(Intent.EXTRA_TEXT, String.format("%s %s", forecastStr, FORECAST_SHARE_HASHTAG));
+
+            return intent;
         }
 
         @Override
@@ -66,11 +118,11 @@ public class DetailActivity extends ActionBarActivity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
-            String forecast = getActivity().getIntent().getExtras().getString("forecast");
+            forecastStr = getActivity().getIntent().getExtras().getString("forecast");
             String forecast2 = getActivity().getIntent().getStringExtra(Intent.EXTRA_TEXT);
 
             TextView textView = (TextView) rootView.findViewById(R.id.detail_text);
-            textView.setText(forecast);
+            textView.setText(forecastStr);
 
             return rootView;
         }
