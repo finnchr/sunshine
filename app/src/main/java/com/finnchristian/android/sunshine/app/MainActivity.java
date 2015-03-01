@@ -1,24 +1,12 @@
 package com.finnchristian.android.sunshine.app;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
-import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-
-import java.util.Arrays;
-import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -120,14 +108,10 @@ public class MainActivity extends ActionBarActivity {
 
 
     private void openPreferredLocationInMap() {
-        String locationKey = getString(R.string.pref_location_key);
-        String defaultLocation = getString(R.string.pref_location_default);
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        String location = pref.getString(locationKey, defaultLocation);
+        String location = Utility.getPreferredLocation(this);
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
         Uri uri = Uri.parse("geo:0,0").buildUpon().appendQueryParameter("q", location).build();
-        //Uri uri = Uri.parse(String.format("geo:0,0?q=%s", location));
         intent.setData(uri);
 
         // Make sure we're able to start activity before actually starting it
@@ -135,46 +119,4 @@ public class MainActivity extends ActionBarActivity {
             startActivity(intent);
         }
     }
-
-
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    /*
-    public static class DetailFragment extends Fragment {
-
-        public DetailFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
-            List<String> weekForecast = Arrays.asList("Today - Sunny - 88 / 63",
-                    "Tomorrow - Foggy - 70 / 46",
-                    "Weds - Cloudy - 72 / 63",
-                    "Thurs - Rainy - 64 / 51",
-                    "Fri - Foggy - 70 / 46",
-                    "Sat - Sunny - 76 / 68");
-
-            FragmentActivity activity = getActivity();
-
-            ArrayAdapter<String> forecastAdapter = new ArrayAdapter<String>(
-                    // The current context (this fragment's parent activity)
-                    activity,
-                    // ID of list item layout
-                    R.layout.list_item_forecast,
-                    // ID of the textview to populate
-                    R.id.list_item_forecast_textview,
-                    // Forecast data
-                    weekForecast);
-
-            ListView forecaseListView = (ListView)rootView.findViewById(R.id.listview_forecast);
-            forecaseListView.setAdapter(forecastAdapter);
-
-            return rootView;
-        }
-    }*/
 }
