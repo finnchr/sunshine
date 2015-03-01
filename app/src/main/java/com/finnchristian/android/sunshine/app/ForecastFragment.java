@@ -60,6 +60,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     static final int COL_COORD_LONG = 8;
 
     protected ForecastAdapter mForecastCursorAdapter;
+    private Loader<Cursor> mLoader;
 
     public ForecastFragment() {
     }
@@ -73,12 +74,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
         menuInflater.inflate(R.menu.forecastfragment, menu);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        updateWeather();
     }
 
     @Override
@@ -127,9 +122,15 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        getLoaderManager().initLoader(FORECAST_LOADER, null, this);
+        mLoader = getLoaderManager().initLoader(FORECAST_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
+
+    public void onLocationChanged() {
+        updateWeather();
+        mLoader.reset();
+    }
+
 
     private void updateWeather() {
         FetchWeatherTask task = new FetchWeatherTask(getActivity());

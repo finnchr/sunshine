@@ -1,6 +1,11 @@
 package com.finnchristian.android.sunshine.app;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.ShareActionProvider;
@@ -14,6 +19,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.finnchristian.android.sunshine.app.data.WeatherContract;
 
 
 public class DetailActivity extends ActionBarActivity {
@@ -57,9 +64,32 @@ public class DetailActivity extends ActionBarActivity {
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class DetailFragment extends Fragment {
+    public static class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
         private static final String TAG = DetailFragment.class.getSimpleName();
         private static final String FORECAST_SHARE_HASHTAG = "#SunshineApp";
+        private static final int FORECAST_LOADER_ID = 0;
+
+        private static final String[] FORECAST_COLUMNS = {
+                // In this case the id needs to be fully qualified with a table name, since
+                // the content provider joins the location & weather tables in the background
+                // (both have an _id column)
+                // On the one hand, that's annoying.  On the other, you can search the weather table
+                // using the location set by the user, which is only in the Location table.
+                // So the convenience is worth it.
+                WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
+                WeatherContract.WeatherEntry.COLUMN_DATE,
+                WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
+                WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
+                WeatherContract.WeatherEntry.COLUMN_MIN_TEMP
+        };
+
+        // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
+        // must change.
+        static final int COL_WEATHER_ID = 0;
+        static final int COL_WEATHER_DATE = 1;
+        static final int COL_WEATHER_DESC = 2;
+        static final int COL_WEATHER_MAX_TEMP = 3;
+        static final int COL_WEATHER_MIN_TEMP = 4;
 
         protected String forecastStr;
         protected ShareActionProvider shareActionProvider;
@@ -74,14 +104,20 @@ public class DetailActivity extends ActionBarActivity {
         }
 
         @Override
+        public void onActivityCreated(Bundle savedInstanceState){
+            getLoaderManager().initLoader(FORECAST_LOADER_ID, null, this);
+            super.onActivityCreated(savedInstanceState);
+        }
+
+
+        @Override
         public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
             inflater.inflate(R.menu.detailfragment, menu);
 
             MenuItem menuItem = menu.findItem(R.id.action_share_weather);
-            //shareActionProvider = (ShareActionProvider) menuItem.getActionProvider();
             shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
 
-            if(shareActionProvider != null) {
+            if(shareActionProvider != null && forecastStr != null && !forecastStr.isEmpty()) {
                 shareActionProvider.setShareIntent(createShareForecastIntent());
             }
             else {
@@ -108,7 +144,6 @@ public class DetailActivity extends ActionBarActivity {
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
             intent.setType("text/plain");
-            //String forecast = getActivity().getIntent().getStringExtra(Intent.EXTRA_TEXT);
             intent.putExtra(Intent.EXTRA_TEXT, String.format("%s %s", forecastStr, FORECAST_SHARE_HASHTAG));
 
             return intent;
@@ -130,6 +165,43 @@ public class DetailActivity extends ActionBarActivity {
             }
 
             return rootView;
+        }
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            Uri uri = Uri.parse(forecastStr);
+            return new CursorLoader(getActivity(), uri, FORECAST_COLUMNS /*projection*/,
+                    null /*selection*/,
+                    null /*selectionArgs*/,
+                    null /*sortOrder*/);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            if(data.moveToFirst()) {
+                long date = data.getLong(COL_WEATHER_DATE);
+                String desc = data.getString(COL_WEATHER_DESC);
+                double max = data.getDouble(COL_WEATHER_MAX_TEMP);
+                double min = data.getDouble(COL_WEATHER_MIN_TEMP);
+
+                boolean isMetric = Utility.isMetric(getActivity());
+
+                forecastStr = String.format("%s - %s - %s/%s", Utility.formatDate(date),
+                        desc,
+                        Utility.formatTemperature(max, isMetric),
+                        Utility.formatTemperature(min, isMetric));
+
+                TextView textView = (TextView) getView().findViewById(R.id.detail_text);
+                textView.setText(forecastStr);
+
+                if(shareActionProvider != null && forecastStr != null && !forecastStr.isEmpty()) {
+                    shareActionProvider.setShareIntent(createShareForecastIntent());
+                }
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
         }
     }
 }
