@@ -188,8 +188,8 @@ public class DetailActivity extends ActionBarActivity {
 
                 forecastStr = String.format("%s - %s - %s/%s", Utility.formatDate(date),
                         desc,
-                        Utility.formatTemperature(max, isMetric),
-                        Utility.formatTemperature(min, isMetric));
+                        Utility.formatTemperature(getActivity(), max, isMetric),
+                        Utility.formatTemperature(getActivity(), min, isMetric));
 
                 TextView textView = (TextView) getView().findViewById(R.id.detail_text);
                 textView.setText(forecastStr);
