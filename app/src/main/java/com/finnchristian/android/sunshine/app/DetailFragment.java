@@ -45,7 +45,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             WeatherContract.WeatherEntry.COLUMN_HUMIDITY,
             WeatherContract.WeatherEntry.COLUMN_WIND_SPEED,
             WeatherContract.WeatherEntry.COLUMN_DEGREES,
-            WeatherContract.WeatherEntry.COLUMN_PRESSURE
+            WeatherContract.WeatherEntry.COLUMN_PRESSURE,
+            WeatherContract.WeatherEntry.COLUMN_WEATHER_ID
     };
 
     // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
@@ -59,6 +60,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_WEATHER_WIND_SPEED = 6;
     static final int COL_WEATHER_DEGREES = 7;
     static final int COL_WEATHER_PRESSURE = 8;
+    static final int COL_WEATHER_CONDITION_ID = 9;
 
     protected String forecastStr;
     protected ShareActionProvider shareActionProvider;
@@ -165,7 +167,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if(data.moveToFirst()) {
-            int id = data.getInt(COL_WEATHER_ID);
+            int weatherId = data.getInt(COL_WEATHER_ID);
             long date = data.getLong(COL_WEATHER_DATE);
             String desc = data.getString(COL_WEATHER_DESC);
             double max = data.getDouble(COL_WEATHER_MAX_TEMP);
@@ -174,6 +176,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             float windSpeed = data.getFloat(COL_WEATHER_WIND_SPEED);
             float degrees = data.getFloat(COL_WEATHER_DEGREES);
             float pressure = data.getFloat(COL_WEATHER_PRESSURE);
+            int weatherConditionId = data.getInt(COL_WEATHER_CONDITION_ID);
 
             boolean isMetric = Utility.isMetric(getActivity());
 
@@ -187,7 +190,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             highView.setText(Utility.formatTemperature(getActivity(), max, isMetric));
             lowView.setText(Utility.formatTemperature(getActivity(), min, isMetric));
 
-            detailIcon.setImageResource(R.drawable.ic_launcher);
+            detailIcon.setImageResource(Utility.getArtResourceForWeatherCondition(weatherConditionId));
             forecastView.setText(desc);
 
             humidityView.setText(Utility.getFormattedHumidity(getActivity(), humidity));
