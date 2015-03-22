@@ -28,7 +28,7 @@ import com.finnchristian.android.sunshine.app.data.WeatherContract;
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = DetailFragment.class.getSimpleName();
     private static final String FORECAST_SHARE_HASHTAG = "#SunshineApp";
-    private static final int FORECAST_LOADER_ID = 0;
+    private static final int DETAIL_LOADER_ID = 0;
 
     private static final String[] FORECAST_COLUMNS = {
             // In this case the id needs to be fully qualified with a table name, since
@@ -74,7 +74,30 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView windView;
     private TextView pressureView;
 
+    private Uri uri;
+
+
+    public static DetailFragment newInstance(Uri uri) {
+        Bundle args = new Bundle();
+        args.putParcelable("Uri", uri);
+
+        DetailFragment fragment = new DetailFragment();
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
     public DetailFragment() {
+    }
+
+    public Uri getUri() {
+        Bundle args = getArguments();
+        if(args != null) {
+            return args.getParcelable("Uri");
+        }
+        else {
+            return null;
+        }
     }
 
     @Override
@@ -85,10 +108,17 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
-        getLoaderManager().initLoader(FORECAST_LOADER_ID, null, this);
         super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(DETAIL_LOADER_ID, null, this);
     }
 
+    void onLocationChanged(String newLocation) {
+        if(uri != null) {
+            long date = WeatherContract.WeatherEntry.getDateFromUri(uri);
+            uri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(newLocation, date);
+            getLoaderManager().restartLoader(DETAIL_LOADER_ID, null, this);
+        }
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -132,6 +162,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        uri = getUri();
+
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
         dayView = (TextView) rootView.findViewById(R.id.detail_day_textview);
@@ -151,17 +184,15 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Intent intent = getActivity().getIntent();
-        if(intent == null) {
+        if(uri != null) {
+            return new CursorLoader(getActivity(), uri, FORECAST_COLUMNS /*projection*/,
+                    null /*selection*/,
+                    null /*selectionArgs*/,
+                    null /*sortOrder*/);
+        }
+        else {
             return null;
         }
-
-        Uri uri = (Uri) intent.getData();
-
-        return new CursorLoader(getActivity(), uri, FORECAST_COLUMNS /*projection*/,
-                null /*selection*/,
-                null /*selectionArgs*/,
-                null /*sortOrder*/);
     }
 
     @Override

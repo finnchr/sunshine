@@ -14,8 +14,11 @@
 
     <ListView
         android:id="@+id/listview_forecast"
+        style="@style/ForecastListStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"></ListView>
+        android:layout_height="wrap_content">
+
+        </ListView>
 
 
 </FrameLayout>

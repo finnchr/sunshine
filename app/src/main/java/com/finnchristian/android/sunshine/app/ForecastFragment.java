@@ -26,6 +26,19 @@ import com.finnchristian.android.sunshine.app.data.WeatherContract;
  * Created by finnchr on 14.02.2015.
  */
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onItemSelected(Uri dateUri);
+    }
+
+
     private static final String TAG = ForecastFragment.class.getSimpleName();
     private static final int FORECAST_LOADER = 0;
 
@@ -61,6 +74,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     protected ForecastAdapter mForecastCursorAdapter;
     private Loader<Cursor> mLoader;
+    private int mPosition;
 
     public ForecastFragment() {
     }
@@ -98,6 +112,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
         final ListView forecaseListView = (ListView)rootView.findViewById(R.id.listview_forecast);
 
+        /*
         forecaseListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView adapterView, View view, int position, long l) {
@@ -112,6 +127,24 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                             ));
                     startActivity(intent);
                 }
+            }
+        });
+        */
+
+        forecaseListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                if (cursor != null) {
+                    String locationSetting = Utility.getPreferredLocation(getActivity());
+                    Uri uri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
+                            locationSetting, cursor.getLong(COL_WEATHER_DATE));
+
+                    Callback callback = (Callback)getActivity();
+                    callback.onItemSelected(uri);
+                }
+
+                mPosition = position;
             }
         });
 
