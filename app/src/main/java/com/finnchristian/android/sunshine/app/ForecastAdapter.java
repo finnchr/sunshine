@@ -84,16 +84,23 @@ public class ForecastAdapter extends CursorAdapter {
         // Read forecast description from cursor
         String forecastDesc = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
         viewHolder.descriptionView.setText(forecastDesc);
+        viewHolder.descriptionView.setContentDescription(
+                String.format(context.getString(R.string.weather_description), forecastDesc));
 
         boolean isMetric = Utility.isMetric(context);
+        String unit = isMetric ? context.getString(R.string.degrees) : context.getString(R.string.fahrenheit);
 
         // Read high temperature from cursor
         double high = cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP);
         viewHolder.highTempView.setText(Utility.formatTemperature(context, high, isMetric));
+        viewHolder.highTempView.setContentDescription(
+                String.format(context.getString(R.string.high_temp_description), high, unit));
 
         // Read low temperature from cursor
         double low = cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP);
         viewHolder.lowTempView.setText(Utility.formatTemperature(context, low, isMetric));
+        viewHolder.lowTempView.setContentDescription(
+                String.format(context.getString(R.string.low_temp_description), low, unit));
     }
 
     public static class ViewHolder {

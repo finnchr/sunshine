@@ -217,16 +217,39 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     Utility.formatTemperature(getActivity(), min, isMetric));
 
             dayView.setText(Utility.getDayName(getActivity(), date));
+            dayView.setContentDescription(Utility.getDayName(getActivity(), date));
+
             dateView.setText(Utility.formatDate(date));
+            dateView.setContentDescription(Utility.formatDate(date));
+
+            String unit = isMetric ? getActivity().getString(R.string.degrees) : getActivity().getString(R.string.fahrenheit);
+
             highView.setText(Utility.formatTemperature(getActivity(), max, isMetric));
+            highView.setContentDescription(
+                    String.format(getActivity().getString(R.string.high_temp_description), max, unit));
+
             lowView.setText(Utility.formatTemperature(getActivity(), min, isMetric));
+            lowView.setContentDescription(
+                    String.format(getActivity().getString(R.string.low_temp_description), min, unit));
 
             detailIcon.setImageResource(Utility.getArtResourceForWeatherCondition(weatherConditionId));
-            forecastView.setText(desc);
+            detailIcon.setContentDescription(String.format(getActivity().getString(R.string.weather_description), desc));
 
-            humidityView.setText(Utility.getFormattedHumidity(getActivity(), humidity));
-            windView.setText(Utility.getFormattedWind(getActivity(), windSpeed, degrees));
-            pressureView.setText(Utility.getFormattedPressure(getActivity(), pressure));
+            forecastView.setText(desc);
+            forecastView.setContentDescription(
+                    String.format(getActivity().getString(R.string.weather_description), desc));
+
+            String humidityFormatted = Utility.getFormattedHumidity(getActivity(), humidity);
+            humidityView.setText(humidityFormatted);
+            humidityView.setContentDescription(humidityFormatted);
+
+            String windFormatted = Utility.getFormattedWind(getActivity(), windSpeed, degrees);
+            windView.setText(windFormatted);
+            windView.setContentDescription(windFormatted);
+
+            String pressureFormatted = Utility.getFormattedPressure(getActivity(), pressure);
+            pressureView.setText(pressureFormatted);
+            pressureView.setContentDescription(pressureFormatted);
 
             if(shareActionProvider != null && forecastStr != null && !forecastStr.isEmpty()) {
                 shareActionProvider.setShareIntent(createShareForecastIntent());

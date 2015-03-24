@@ -48,4 +48,15 @@
     <!-- Humidity format CHAR LIMIT=25]-->
     <string name="format_humidity">Humidity: <xliff:g id="humidity">%1.0f</xliff:g> %%</string>
 
+    <string name="weather_description">Weather forecast: %s</string>
+    <string name="high_temp_description">High temperature: %1$s %2$s</string>
+    <string name="low_temp_description">Low temperature: %1$s %2$s</string>
+
+    <string name="humidity_description">Humidity: %s</string>
+    <string name="pressure_description">Pressure: %s</string>
+    <string name="wind_description">Wind: %s</string>
+
+    <string name="degrees">degrees</string>
+    <string name="fahrenheit">fahrenheit</string>
+
 </resources>
