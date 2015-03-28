@@ -59,4 +59,8 @@
     <string name="degrees">degrees</string>
     <string name="fahrenheit">fahrenheit</string>
 
+    <!-- Account type (for sync-adapter authenticator) -->
+    <!-- SyncAdapter related -->
+    <string name="sync_account_type">sunshine.finnchristian.com</string>
+    <string name="content_authority">com.finnchristian.android.sunshine.app</string>
 </resources>
