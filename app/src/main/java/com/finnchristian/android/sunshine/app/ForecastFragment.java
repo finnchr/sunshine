@@ -27,10 +27,11 @@ import com.finnchristian.android.sunshine.app.data.WeatherContract;
 import com.finnchristian.android.sunshine.app.service.SunshineService;
 import com.finnchristian.android.sunshine.app.sync.SunshineSyncAdapter;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 
-/**
- * Created by finnchr on 14.02.2015.
- */
+
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private boolean mUseTodayLayout;
 
@@ -108,10 +109,34 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 updateWeather();
                 return true;
 
+            case R.id.action_show_preferred_location:
+                openPreferredLocationInMap();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    private void openPreferredLocationInMap() {
+        Cursor cursor = mForecastCursorAdapter.getCursor();
+        if(cursor != null && cursor.moveToFirst()) {
+
+            String lat = cursor.getString(COL_COORD_LAT);
+            String lng = cursor.getString(COL_COORD_LONG);
+
+            String uriString = String.format("geo:%s,%s", lat, lng);
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            Uri uri = Uri.parse(uriString);
+            intent.setData(uri);
+
+            // Make sure we're able to start activity before actually starting it
+            if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                startActivity(intent);
+            }
+        }
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -200,7 +225,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mForecastCursorAdapter.swapCursor(data);
 
-        if(mPosition >= 0) {
+        if(mPosition >= 0 && mPosition < mForecastCursorAdapter.getCount()) {
             mForecastListView.setSelection(mPosition);
             mForecastListView.smoothScrollToPosition(mPosition);
         }

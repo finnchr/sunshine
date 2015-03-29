@@ -213,8 +213,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
             forecastStr = String.format("%s - %s - %s/%s", Utility.formatDate(date),
                     desc,
-                    Utility.formatTemperature(getActivity(), max, isMetric),
-                    Utility.formatTemperature(getActivity(), min, isMetric));
+                    Utility.formatTemperature(getActivity(), max),
+                    Utility.formatTemperature(getActivity(), min));
 
             dayView.setText(Utility.getDayName(getActivity(), date));
             dayView.setContentDescription(Utility.getDayName(getActivity(), date));
@@ -224,11 +224,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
             String unit = isMetric ? getActivity().getString(R.string.degrees) : getActivity().getString(R.string.fahrenheit);
 
-            highView.setText(Utility.formatTemperature(getActivity(), max, isMetric));
+            highView.setText(Utility.formatTemperature(getActivity(), max));
             highView.setContentDescription(
                     String.format(getActivity().getString(R.string.high_temp_description), max, unit));
 
-            lowView.setText(Utility.formatTemperature(getActivity(), min, isMetric));
+            lowView.setText(Utility.formatTemperature(getActivity(), min));
             lowView.setContentDescription(
                     String.format(getActivity().getString(R.string.low_temp_description), min, unit));
 

@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.finnchristian.android.sunshine.app.sync.SunshineSyncAdapter;
+
 
 public class MainActivity extends ActionBarActivity implements ForecastFragment.Callback {
     public static final String TAG = MainActivity.class.getSimpleName();
@@ -44,6 +46,8 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
 
         mLocation = Utility.getPreferredLocation(this);
         Log.d(TAG, "onCreate invoked");
+
+        SunshineSyncAdapter.initializeSyncAdapter(this);
     }
 
     @Override
@@ -147,15 +151,15 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
             return true;
         }
 
-        else if(id == R.id.action_show_preferred_location) {
+        /*else if(id == R.id.action_show_preferred_location) {
             openPreferredLocationInMap();
             return true;
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }
 
-
+/*
     private void openPreferredLocationInMap() {
         String location = Utility.getPreferredLocation(this);
 
@@ -167,5 +171,5 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
         if(intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
         }
-    }
+    }*/
 }
